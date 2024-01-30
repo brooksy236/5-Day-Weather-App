@@ -1,0 +1,20 @@
+.weather-header {
+    background-color: blue;
+
+}
+
+.card {
+    background: rgb(93, 192, 228);
+    padding: 40px;
+    min-width: 300px;
+    align-items: center;
+    display: none;
+}
+
+.forecast {
+    background: rgb(93, 192, 228);
+    padding: 40px;
+    min-width: 300px;
+    align-items: center;
+    display: flex;
+}
