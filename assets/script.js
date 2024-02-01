@@ -14,8 +14,6 @@ weatherToday.addEventListener("submit", async event => {
         try {
             const weatherData = await getWeatherData(city);
             displayWeatherInfo(weatherData);
-            const forecastData = await getForecastData();
-            displayForecastInfo(forecastData);
         }
         catch(error){
             console.error(error);
@@ -84,7 +82,7 @@ function displayWeatherInfo(data){
 
 }
 
-function displayForecastInfo(){
+function displayForecast(){
     $('#forecast').append("<h3>Temp: " + (data.list.main.temp -= 273.15).toFixed(2) + "°C</h3>")
 
 }
