@@ -7,10 +7,11 @@ const card = document.querySelector(".card");
 const myKey = "fb390030446cd7ca58f93b55b46a5609";
 let previousSearch = JSON.parse(localStorage.getItem("weather")) || []
 
+// Adds the search value to the local storage
 weatherToday.addEventListener("submit", async event => {
     event.preventDefault();
+    clear();
     const city = userSearch.value;
-
     if (city) {
         try {
             const weatherData = getWeatherData(city);
@@ -26,10 +27,14 @@ weatherToday.addEventListener("submit", async event => {
             displayError(error);
         }
     } else {
-        displayError("Please enter a city");
+        displayError("Error: Please enter a valid location");
     }
 })
 
+$("#clear-all").on("click", clear);
+
+
+// Gets the weather data from the API
 function getWeatherData(city) {
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${myKey}`)
         .then(response1 => response1.json())
@@ -47,10 +52,11 @@ function getWeatherData(city) {
             return data2
         })
         .catch(error => {
-            console.error("Eror fetching data:", error);
+            console.error("Error fetching data:", error);
         });
 }
 
+// Reloads the data from the previous search buttons
 $("#history").on("click", ".searchbtn", function () {
     console.log($(this).text())
     getWeatherData($(this).text())
@@ -59,31 +65,32 @@ $("#history").on("click", ".searchbtn", function () {
 searchButtons();
 function searchButtons() {
     let previousSearch = JSON.parse(localStorage.getItem("weather")) || []
-    $("#history").empty()
     for (let i = 0; i < previousSearch.length; i++) {
         $("#history").append(`<button class="searchbtn btn btn-warning">${previousSearch[i]}</button>`)
-    }
+    } 
 }
 
+function clear() {
+    localStorage.clear()
+    $("#history").empty();
+  }
+
 function displayWeatherInfo(data) {
-
     card.textContent = "";
-
     $('#today').html("<h1>" + today + "</h1>")
     $('#today').append("<h3>" + data.name + "</h3>")
-    $('#today').append("<p>Temp: " + (data.main.temp -= 273.15).toFixed(2) + "°C</p>")
-    $('#today').append("<p>Wind Speed: " + (data.wind.speed).toFixed(2) + "KPH</p>")
-    $('#today').append("<p>Humidity: " + data.main.humidity + "%</p>")
-    $('#today').append("<h4>" + (data.weather[0].description) + "</h4>")
     let iconLink = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
     $('#today').append(`<img src="${iconLink}" />`)
+    // $('#today').append("<h3>" + (data.weather[0].description) + "</h3>")
+    $('#today').append("<h4>Temp: " + (data.main.temp -= 273.15).toFixed(2) + "°C</h4>")
+    $('#today').append("<h4>Wind Speed: " + (data.wind.speed).toFixed(2) + "KPH</h4>")
+    $('#today').append("<h4>Humidity: " + data.main.humidity + "%</h4>")
 }
 
 function displayForecast(listData) {
     var cardLayout = ""
     for (let i = 7, j = 1; i < listData.length, j < 6; i = i + 8, j = j + 1) { //'i' is to get the correct day in the list data (every 8th) and 'j' is to loop through the day from today using dayjs as the starting point to get the next 5 days to show in the cards
         const forecastDay = dayjs().add(j, 'day').format("ddd")  //adds a day for every iteration of 'j' 
-
         cardLayout += `
         <div class="card"">
         <div class="card-body">
@@ -97,14 +104,13 @@ function displayForecast(listData) {
     }
     $("#forecast").empty()
     $('#forecast').append(cardLayout)
-
 }
 
+// diplays error message 
 function displayError(message) {
     const errorDisplay = document.createElement("p");
     errorDisplay.textContent = message;
     errorDisplay.classList.add("errorDisplay");
-
     card.textContent = "";
     card.classList.add("flex");
     card.appendChild(errorDisplay);

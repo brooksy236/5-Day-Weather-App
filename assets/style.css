@@ -1,6 +1,9 @@
+body {
+    background-color: rgb(104, 226, 104);
+}
+
 .weather-header {
     background-color: blue;
-
 }
 
 .card {
@@ -31,7 +34,16 @@
 .weatherSearch {
     margin: 10px;
 }
-/* 
-p {
-    font-size: 3vh;
-} */
+
+.emptySearch {
+    display: flex;
+    margin: 10px;
+}
+
+.fa-trash {
+    margin: 4px;
+} 
+
+.fa-search {
+    margin: 4px;
+} 
