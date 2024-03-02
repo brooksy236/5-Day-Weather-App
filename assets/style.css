@@ -8,12 +8,30 @@
     /* padding: 40px; */
     /* min-width: 300px; */
     align-items: center;
+    margin: 10px;
 }
 
 .forecast {
     background: rgb(93, 192, 228);
     /* padding: 40px; */
     /* min-width: 200px; */
-    align-items: center;
+    /* text-align: center; */
     display: flex;
 }
+
+.card-body {
+    text-align: center;
+}
+
+.search-button {
+    display: flex;
+    margin: 10px;
+}
+
+.weatherSearch {
+    margin: 10px;
+}
+/* 
+p {
+    font-size: 3vh;
+} */
