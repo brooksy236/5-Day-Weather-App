@@ -1,22 +1,25 @@
 dayjs.extend(window.dayjs_plugin_advancedFormat)
-let today = dayjs().format("(dddd Do MM YYYY)");
-    
+let today = dayjs().format("dddd Do MMMM YYYY");
+
 const weatherToday = document.querySelector(".weatherToday");
 const userSearch = document.querySelector(".weatherSearch");
 const card = document.querySelector(".card");
 const myKey = "fb390030446cd7ca58f93b55b46a5609";
 let  previousSearch = JSON.parse(localStorage.getItem("weather")) || []
+
 weatherToday.addEventListener("submit", async event => {
     event.preventDefault();
     const city = userSearch.value;
 
     if(city){
         try {
-            const weatherData = await getWeatherData(city);
+            const weatherData = getWeatherData(city);
+            if ( previousSearch.includes(userSearch) ){
+                previousSearch.push();
+            }
             previousSearch.push(city)
             localStorage.setItem("weather",JSON.stringify(previousSearch))
             searchButtons();
-            //await console.log(weatherData)
         }
         catch(error){
             console.error(error);
@@ -48,80 +51,50 @@ function getWeatherData(city) {
     });
 }
 
-
 $("#history").on("click",".searchbtn",function(){
     console.log($(this).text())
     getWeatherData($(this).text())
 })
-/*
-const lat = none
-const lon = none
-
-
-async function getWeatherData(city) {
-    const queryWeather = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${myKey}`;
-    const response = await fetch(queryWeather);
-    if(!response.ok){
-        throw new Error("Couldn't fetch weather data")
-    }
-    return await response.json()
-}
-
-async function getForecastData(city) {
-    let data = await getWeatherData(city)
-    console.log(data)
-    lon = $(data.coord.lon)
-    lat = $(data.coord.lat)
-    const queryForecast = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=` + myKey;
-    const response2 = await fetch(queryForecast);
-    console.log(data)
-    return await response2.json();
-}
-
-getForecastData()
-*/
 
 searchButtons();
 function searchButtons() {
     let  previousSearch = JSON.parse(localStorage.getItem("weather")) || []
     $("#history").empty()
     for (let i=0; i<previousSearch.length; i++) {
-        $("#history").append(`<button class="searchbtn">${previousSearch[i]}</button>`)
+        $("#history").append(`<button class="searchbtn btn btn-secondary">${previousSearch[i]}</button>`)
     }
 }
 
 function displayWeatherInfo(data){
-    const  {name: city, 
-            main: {temp, humidity}, 
-            weather: [{description, id}]} = data;
 
     card.textContent = "";
-    card.classList.add("flex");
     
-    $('#today').html("<h1>" + data.name + ": " + today + "</h1>")
-    $('#today').append("<h3>Temp: " + (data.main.temp -= 273.15).toFixed(2) + "°C</h3>")
-    $('#today').append("<h3>Wind Speed: " + (data.wind.speed).toFixed(2) + "KPH</h3>")
-    $('#today').append("<h3>Humidity: " + (data.main.humidity) + "%</p>")
+    $('#today').html("<h1>" + today + "</h1>")
+    $('#today').append("<h1>" + data.name + "</h1>")
+    $('#today').append("<p>Temp: " + (data.main.temp -= 273.15).toFixed(2) + "°C</p>")
+    $('#today').append("<p>Wind Speed: " + (data.wind.speed).toFixed(2) + "KPH</p>")
+    $('#today').append("<p>Humidity: " + data.main.humidity + "%</p>")
     $('#today').append("<h4>" + (data.weather[0].description) + "</h4>")
     let iconLink = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
     $('#today').append(`<img src="${iconLink}" />`)
-
 }
 
 function displayForecast(listData){
     var cardLayout = ""
-    for (let i=0; i<listData.length;i=i+8) {
+    for (let i=7, j=1; i < listData.length, j < 6; i=i+8, j=j+1) {
+        const forecastDay = dayjs().add(j, 'day').format("ddd")
+
         cardLayout += `
         <div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title">Temp:${(listData[i].main.temp -= 273.15).toFixed(2)}</h5>
-    <h6 class="card-subtitle mb-2 text-body-secondary">Humidity: ${(listData[i].main.humidity)}</h6>
-    <p class="card-text">${listData[i].dt_txt}</p>
-    <img src="https://openweathermap.org/img/wn/${listData[i].weather[0].icon}@2x.png" > </img>
-    <p class="card-text">${listData[i].wind.speed}</p>
-  </div>
-</div>
-        `
+        <div class="card-body">
+        <h2 class="card-title"> ${forecastDay} </h2>
+            <h5 class="card-title">Temp: ${(listData[i].main.temp -= 273.15).toFixed(1)}°C</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">Humidity: ${(listData[i].main.humidity)}%</h6>
+            <p class="card-text">${listData[i].dt_txt}</p>
+            <img src="https://openweathermap.org/img/wn/${listData[i].weather[0].icon}@2x.png" > </img>
+            <p class="card-text">Wind Speed: ${listData[i].wind.speed}</p>
+        </div>
+    </div>  `
     }
     $("#forecast").empty()
     $('#forecast').append(cardLayout)
@@ -137,4 +110,8 @@ function displayError(message){
     card.classList.add("flex");
     card.appendChild(errorDisplay);
 }
+
+
+
+    
 
